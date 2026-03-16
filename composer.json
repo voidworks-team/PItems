@@ -1,0 +1,15 @@
+{
+    "name": "voidworks/pitems",
+    "type": "project",
+    "require": {
+        "abstract/command-framework": "^0.4",
+        "muqsit/invmenu": "dev-pm5"
+    },
+    "require-dev": {
+        "pocketmine/pocketmine-mp": "5.41.0"
+    },
+    "repositories": [
+        {"type": "vcs", "url": "git@github.com:Abstract-Resources/command-framework"},
+        {"type": "vcs", "url": "git@github.com:heyyvic/InvMenuNormal.git"}
+    ]
+}

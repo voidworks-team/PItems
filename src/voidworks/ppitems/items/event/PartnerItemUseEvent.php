@@ -1,0 +1,37 @@
+<?php
+
+namespace voidworks\ppitems\items\event;
+
+use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
+use pocketmine\event\Event;
+use pocketmine\player\Player;
+use voidworks\ppitems\items\impl\PartnerItem;
+
+class PartnerItemUseEvent extends Event implements Cancellable {
+    use CancellableTrait;
+
+
+    public function __construct(
+        protected Player $player,
+        protected PartnerItem $item
+    ) {
+
+    }
+
+    /**
+     * @return Player
+     */
+    public function getPlayer(): Player {
+        return $this->player;
+    }
+
+    /**
+     * @return PartnerItem
+     */
+    public function getPartnerItem(): PartnerItem {
+        return $this->item;
+    }
+
+
+}
