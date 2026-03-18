@@ -6,8 +6,6 @@ namespace voidworks\ppitems\command;
 use abstractplugin\command\BaseCommand;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\transaction\DeterministicInvMenuTransaction;
-use muqsit\invmenu\transaction\InvMenuTransaction;
-use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use muqsit\invmenu\type\InvMenuTypeIds;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\DefaultPermissions;
@@ -25,6 +23,10 @@ final class PartnerItemCommand extends BaseCommand {
         $this->registerParent(new parent\GiveArgument);
     }
 
+    public function getPermission(): ?string {
+        return DefaultPermissions::ROOT_USER;
+    }
+
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
         if (!$sender instanceof Player) {
             $sender->sendMessage(TextFormat::RED . 'You must be player for execute this command!');
@@ -40,7 +42,7 @@ final class PartnerItemCommand extends BaseCommand {
                 $invMenu->getInventory()->addItem($pItem->getItem());
             }
 
-            $invMenu->setListener(InvMenu::readonly(function (DeterministicInvMenuTransaction $transaction) use ($handler) : void{
+            $invMenu->setListener(InvMenu::readonly(function (DeterministicInvMenuTransaction $transaction) use ($handler): void {
                 $player = $transaction->getPlayer();
                 $itemClicked = $transaction->getItemClicked();
 
@@ -49,7 +51,7 @@ final class PartnerItemCommand extends BaseCommand {
                 }
 
                 if ($player->getServer()->isOp($player->getName())) {
-                    if($player->getInventory()->canAddItem($itemClicked)){
+                    if ($player->getInventory()->canAddItem($itemClicked)) {
                         $player->getInventory()->addItem($itemClicked);
                     } else {
                         $player->dropItem($itemClicked);
@@ -63,9 +65,5 @@ final class PartnerItemCommand extends BaseCommand {
         }
 
         parent::execute($sender, $commandLabel, $args);
-    }
-
-    public function getPermission(): ?string {
-        return DefaultPermissions::ROOT_USER;
     }
 }

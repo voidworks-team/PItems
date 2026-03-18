@@ -13,7 +13,7 @@ use voidworks\ppitems\listener\BaseListener;
 use voidworks\ppitems\session\SessionHandler;
 
 class Loader extends PluginBase {
-    use SingletonTrait{
+    use SingletonTrait {
         make as private;
         reset as private;
     }
@@ -24,6 +24,27 @@ class Loader extends PluginBase {
 
     protected PartnerItemsHandler $partnerItemsHandler;
     protected SessionHandler $sessionHandler;
+
+    /**
+     * @return SessionHandler
+     */
+    public function getSessionHandler(): SessionHandler {
+        return $this->sessionHandler;
+    }
+
+    /**
+     * @return PartnerItemsHandler
+     */
+    public function getPartnerItemsHandler(): PartnerItemsHandler {
+        return $this->partnerItemsHandler;
+    }
+
+    /**
+     * @return Config
+     */
+    public function getBlacklists(): Config {
+        return $this->blacklists;
+    }
 
     protected function onLoad(): void {
         self::setInstance($this);
@@ -56,26 +77,5 @@ class Loader extends PluginBase {
 
     protected function onDisable(): void {
 
-    }
-
-    /**
-     * @return SessionHandler
-     */
-    public function getSessionHandler(): SessionHandler {
-        return $this->sessionHandler;
-    }
-
-    /**
-     * @return PartnerItemsHandler
-     */
-    public function getPartnerItemsHandler(): PartnerItemsHandler {
-        return $this->partnerItemsHandler;
-    }
-
-    /**
-     * @return Config
-     */
-    public function getBlacklists(): Config {
-        return $this->blacklists;
     }
 }

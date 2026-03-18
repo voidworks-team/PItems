@@ -13,7 +13,7 @@ class PartnerItemUseEvent extends Event implements Cancellable {
 
 
     public function __construct(
-        protected Player $player,
+        protected Player      $player,
         protected PartnerItem $item
     ) {
 

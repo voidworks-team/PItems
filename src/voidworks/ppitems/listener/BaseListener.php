@@ -3,14 +3,10 @@
 namespace voidworks\ppitems\listener;
 
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerItemUseEvent;
-use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\player\Player;
-use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
-use voidworks\ppitems\items\event\PartnerItemUseEvent;
 use voidworks\ppitems\items\impl\OnAttackPartnerItem;
 use voidworks\ppitems\items\impl\OnUsePartnerItem;
 use voidworks\ppitems\items\impl\PartnerItem;
@@ -34,7 +30,7 @@ final class BaseListener implements Listener {
         $partnerItem = $this->handler->getPartnerItem($event->getItem());
         $player = $event->getPlayer();
 
-        if($partnerItem === null){
+        if ($partnerItem === null) {
             return;
         }
 
@@ -44,10 +40,24 @@ final class BaseListener implements Listener {
             return;
         }
 
-        if($partnerItem instanceof OnUsePartnerItem){
-			$session->applyCooldowns($partnerItem);
+        if ($partnerItem instanceof OnUsePartnerItem) {
+            $session->applyCooldowns($partnerItem);
             $partnerItem->onUse($event->getPlayer());
         }
+    }
+
+    private function sendCooldownMessageIfOnCooldown(Player $player, Session $session, PartnerItem $partnerItem): bool {
+        if ($session->hasGlobalCooldown()) {
+            $player->sendMessage(TextFormat::RED . 'You have global ability cooldown: ' . $session->formatToTime($session->getGlobalCooldown()));
+            return true;
+        }
+
+        if ($session->hasCooldown($partnerItem)) {
+            $player->sendMessage(TextFormat::RED . 'You have ' . $partnerItem->getDisplayName() . ' cooldown: ' . $session->formatToTime($session->getCooldown($partnerItem)));
+            return true;
+        }
+
+        return false;
     }
 
     public function onEntityDamageEvent(EntityDamageByEntityEvent $event): void {
@@ -69,19 +79,5 @@ final class BaseListener implements Listener {
             $session->applyCooldowns($partnerItem);
             $partnerItem->onAttack($damager, $player);
         }
-    }
-
-    private function sendCooldownMessageIfOnCooldown(Player $player, Session $session, PartnerItem $partnerItem): bool {
-        if ($session->hasGlobalCooldown()) {
-            $player->sendMessage(TextFormat::RED . 'You have global ability cooldown: ' . $session->formatToTime($session->getGlobalCooldown()));
-            return true;
-        }
-
-        if ($session->hasCooldown($partnerItem)) {
-            $player->sendMessage(TextFormat::RED . 'You have ' . $partnerItem->getDisplayName() . ' cooldown: ' . $session->formatToTime($session->getCooldown($partnerItem)));
-            return true;
-        }
-
-        return false;
     }
 }

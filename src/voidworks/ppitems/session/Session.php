@@ -16,7 +16,7 @@ final class Session {
     protected array $itemsCooldowns = [];
     protected int $globalCooldown = 0;
 
-    public function __construct (
+    public function __construct(
         protected Player $player
     ) {
         $this->loader = $player->getServer()->getPluginManager()->getPlugin("PartnerItems") ?? throw new RuntimeException();
@@ -40,10 +40,6 @@ final class Session {
         return $this->globalCooldown;
     }
 
-    public function getCooldown(PartnerItem $item): int {
-        return $this->itemsCooldowns[$item->getIdentifier()] ??= 0;
-    }
-
     /**
      * @return array
      */
@@ -58,6 +54,10 @@ final class Session {
     public function applyCooldowns(PartnerItem $item): void {
         $this->globalCooldown = ($now = time()) + $this->loader->getConfig()->get(Loader::GLOBAL_COOLDOWN_TAG, 15);
         $this->itemsCooldowns[$item->getIdentifier()] = $now + $item->getCooldown();
+    }
+
+    public function getCooldown(PartnerItem $item): int {
+        return $this->itemsCooldowns[$item->getIdentifier()] ??= 0;
     }
 
     public function formatToTime(int $cooldown): string {

@@ -6,7 +6,7 @@ use RuntimeException;
 
 final class StringToTimeTranslator {
 
-    public static function format(int $timestamp) : string {
+    public static function format(int $timestamp): string {
         if ($timestamp > time()) {
             $timestamp -= time();
         }
@@ -16,11 +16,11 @@ final class StringToTimeTranslator {
         $m = floor(($timestamp % 3600) / 60);
         $s = $timestamp % 60;
 
-        if($d > 0){
+        if ($d > 0) {
             return sprintf("%d days %02d:%02d:%02d", $d, $h, $m, $s);
-        }elseif($h > 0){
+        } elseif ($h > 0) {
             return sprintf("%02d:%02d:%02d", $h, $m, $s);
-        }elseif($m > 0){
+        } elseif ($m > 0) {
             return sprintf("%02d:%02d", $m, $s);
         }
 

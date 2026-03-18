@@ -9,7 +9,6 @@ use ReflectionClass;
 use ReflectionException;
 use voidworks\ppitems\items\impl\PartnerItem;
 use voidworks\ppitems\Loader;
-use WeakMap;
 
 final class PartnerItemsHandler {
 
@@ -20,7 +19,7 @@ final class PartnerItemsHandler {
     public function __construct(
         protected Loader $plugin
     ) {
-       $this->prepare();
+        $this->prepare();
     }
 
     private function prepare(): void {
@@ -47,7 +46,7 @@ final class PartnerItemsHandler {
                     if ($instance instanceof PartnerItem) {
                         $this->register($instance);
                     }
-                }catch (ReflectionException $exception){
+                } catch (ReflectionException $exception) {
                     //pass
                 }
             }
@@ -57,7 +56,7 @@ final class PartnerItemsHandler {
     private function register(PartnerItem $partnerItem): void {
         $k = $partnerItem->getIdentifier();
 
-        if($this->plugin->getBlacklists()->exists($k, true)){
+        if ($this->plugin->getBlacklists()->exists($k, true)) {
             return;
         }
 
@@ -71,7 +70,7 @@ final class PartnerItemsHandler {
      * @return PartnerItem|null
      */
     public function getPartnerItem(Item $item): ?PartnerItem {
-        if(!($tag = $item->getNamedTag()->getTag(self::PARTNER_ITEM_NAME_TAG)) instanceof StringTag) {
+        if (!($tag = $item->getNamedTag()->getTag(self::PARTNER_ITEM_NAME_TAG)) instanceof StringTag) {
             return null;
         }
 

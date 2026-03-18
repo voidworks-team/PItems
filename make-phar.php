@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-use pocketmine\utils\Git;
-use pocketmine\utils\Terminal;
-
 /*require_once("vendor\pocketmine\pocketmine-mp\src\utils\Git.php");
 require_once("vendor\pocketmine\pocketmine-mp\src\utils\Process.php");
 require_once("vendor\pocketmine\pocketmine-mp\src\utils\Terminal.php");
@@ -41,9 +38,9 @@ function main(): Generator {
     if (file_exists($targetPath . $pharName)) {
         yield 'Phar file already exists, overwriting...';
 
-        try{
+        try {
             Phar::unlinkArchive($targetPath . $pharName);
-        }catch(PharException){
+        } catch (PharException) {
             //unlinkArchive() doesn't like dodgy phars
             unlink($targetPath . $pharName);
         }
@@ -96,7 +93,8 @@ function main(): Generator {
     $phar->setMetadata($array);
 
     yield '------------------------------------------------';
-    yield /*Terminal::$COLOR_GREEN . */'BUILD SUCCESS';
+    yield /*Terminal::$COLOR_GREEN . */
+    'BUILD SUCCESS';
     yield '------------------------------------------------';
 
     $count = count($phar->buildFromIterator(new ArrayIterator($files)));
@@ -111,7 +109,7 @@ function main(): Generator {
 
 /**
  * @param string $ymlPath
- * @param bool   $updateVersion
+ * @param bool $updateVersion
  *
  * @return array
  */
@@ -123,7 +121,7 @@ function readAndUpdatePluginYml(string $ymlPath, bool $updateVersion): array {
     }
 
     $matches = array_map("intval", explode(".", $array['version']));
-    if(count($matches) < 2){
+    if (count($matches) < 2) {
         throw new InvalidArgumentException("Invalid version '" . $array['version'] . "', should contain at least 2 version digits");
     }
 
@@ -146,5 +144,6 @@ function readAndUpdatePluginYml(string $ymlPath, bool $updateVersion): array {
 //Terminal::init(true);
 
 foreach (main() as $line) {
-    echo /*Terminal::$COLOR_GRAY . '[' . Terminal::$COLOR_BLUE . 'INFO' . Terminal::$COLOR_GRAY . '] ' . Terminal::$COLOR_WHITE . */$line . PHP_EOL;
+    echo /*Terminal::$COLOR_GRAY . '[' . Terminal::$COLOR_BLUE . 'INFO' . Terminal::$COLOR_GRAY . '] ' . Terminal::$COLOR_WHITE . */
+        $line . PHP_EOL;
 }

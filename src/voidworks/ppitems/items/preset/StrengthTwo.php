@@ -4,7 +4,6 @@ namespace voidworks\ppitems\items\preset;
 
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
-use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -26,7 +25,7 @@ class StrengthTwo extends BasePartnerItem implements OnUsePartnerItem {
         $effect = new EffectInstance(VanillaEffects::STRENGTH(), 20 * 7, 1);
 
         if ($effectManager->add($effect)) {
-            $player->sendMessage(TextFormat::colorize('&r&aYou have received &eStrength II &afor '. ($effect->getDuration() / 20) .' seconds!'));
+            $player->sendMessage(TextFormat::colorize('&r&aYou have received &eStrength II &afor ' . ($effect->getDuration() / 20) . ' seconds!'));
 
         }
     }

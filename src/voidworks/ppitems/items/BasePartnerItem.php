@@ -17,14 +17,14 @@ abstract class BasePartnerItem implements PartnerItem {
     public function __construct(
         protected string $identifier,
         protected string $displayName,
-        protected Item $item
+        protected Item   $item
     ) {
         $this->displayName = TextFormat::colorize($this->displayName);
         $dir = Loader::getInstance()->getDataFolder() . "/items";
-        if(!is_dir($dir)){
+        if (!is_dir($dir)) {
             mkdir($dir);
         }
-        $config = new Config($dir."/".$this->identifier.".yml", Config::YAML);
+        $config = new Config($dir . "/" . $this->identifier . ".yml", Config::YAML);
         $this->cooldown = $config->get("cooldown", 60);
         $this->lore = array_map([TextFormat::class, "colorize"], $config->get("lore", []));
         $this->item->setCustomName($this->displayName);
