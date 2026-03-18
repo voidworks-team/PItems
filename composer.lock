@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0a1e9ab039f86436ef9c1cdbb9afa59b",
+    "content-hash": "c2fa89794167dba1ce6ae1fb5cc7ca02",
     "packages": [
         {
             "name": "abstract/command-framework",
@@ -1148,7 +1148,9 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
+    "platform": {
+        "ext-yaml": "*"
+    },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"
 }

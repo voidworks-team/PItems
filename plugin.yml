@@ -1,4 +1,7 @@
+---
 name: PartnerItems
 author: VoidWorks
 api: 5.0.0
-version: 1.0.0
+version: "1.0"
+main: voidworks\ppitems\Loader
+...

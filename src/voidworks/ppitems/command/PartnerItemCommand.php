@@ -10,16 +10,19 @@ use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use muqsit\invmenu\type\InvMenuTypeIds;
 use pocketmine\command\CommandSender;
+use pocketmine\permission\DefaultPermissions;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use voidworks\ppitems\Loader;
 
-class PartnerItemCommand extends BaseCommand {
+final class PartnerItemCommand extends BaseCommand {
 
     public function __construct() {
-        parent::__construct('ppitems', 'Partner item command description.');
+        parent::__construct('pitems', 'Partner item command description.');
 
         $this->setPermission($this->getPermission());
+
+        $this->registerParent(new parent\GiveArgument);
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
@@ -33,8 +36,8 @@ class PartnerItemCommand extends BaseCommand {
             $invMenu = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
             $handler = Loader::getInstance()->getPartnerItemsHandler();
 
-            foreach ($handler->getPartnerItems() as $item) {
-                $invMenu->getInventory()->addItem($item);
+            foreach ($handler->getPartnerItems() as $pItem) {
+                $invMenu->getInventory()->addItem($pItem->getItem());
             }
 
             $invMenu->setListener(InvMenu::readonly(function (DeterministicInvMenuTransaction $transaction) use ($handler) : void{
@@ -54,6 +57,8 @@ class PartnerItemCommand extends BaseCommand {
                 }
             }));
 
+            $invMenu->send($sender);
+
             return;
         }
 
@@ -61,6 +66,6 @@ class PartnerItemCommand extends BaseCommand {
     }
 
     public function getPermission(): ?string {
-        return null;
+        return DefaultPermissions::ROOT_USER;
     }
 }

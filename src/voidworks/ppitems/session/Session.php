@@ -3,21 +3,23 @@
 namespace voidworks\ppitems\session;
 
 use pocketmine\player\Player;
-use pocketmine\Server;
+use pocketmine\plugin\Plugin;
+use RuntimeException;
 use voidworks\ppitems\items\impl\PartnerItem;
 use voidworks\ppitems\Loader;
+use voidworks\ppitems\utils\StringToTimeTranslator;
 
 final class Session {
 
-    protected Loader $loader;
+    protected Plugin $loader;
 
-    protected array $itemsCoodowns = [];
+    protected array $itemsCooldowns = [];
     protected int $globalCooldown = 0;
 
     public function __construct (
         protected Player $player
     ) {
-        $this->loader = $player->getServer()->getPluginManager()->getPlugin("PartnerItems");
+        $this->loader = $player->getServer()->getPluginManager()->getPlugin("PartnerItems") ?? throw new RuntimeException();
     }
 
     /**
@@ -28,14 +30,25 @@ final class Session {
     }
 
     public function hasCooldown(PartnerItem $item): bool {
-        return ($this->itemsCoodowns[$item->getIdentifier()] ??= 0) >= time();
+        return ($this->itemsCooldowns[$item->getIdentifier()] ??= 0) >= time();
+    }
+
+    /**
+     * @return int
+     */
+    public function getGlobalCooldown(): int {
+        return $this->globalCooldown;
+    }
+
+    public function getCooldown(PartnerItem $item): int {
+        return $this->itemsCooldowns[$item->getIdentifier()] ??= 0;
     }
 
     /**
      * @return array
      */
-    public function getItemsCoodowns(): array {
-        return $this->itemsCoodowns;
+    public function getItemsCooldowns(): array {
+        return $this->itemsCooldowns;
     }
 
     /**
@@ -44,6 +57,10 @@ final class Session {
      */
     public function applyCooldowns(PartnerItem $item): void {
         $this->globalCooldown = ($now = time()) + $this->loader->getConfig()->get(Loader::GLOBAL_COOLDOWN_TAG, 15);
-        $this->itemsCoodowns[$item->getIdentifier()] = $now + $item->getCooldown();
+        $this->itemsCooldowns[$item->getIdentifier()] = $now + $item->getCooldown();
+    }
+
+    public function formatToTime(int $cooldown): string {
+        return StringToTimeTranslator::format($cooldown);
     }
 }

@@ -27,12 +27,24 @@ final class PartnerItemsHandler {
         $dir = scandir(__DIR__ . "/preset/");
         if ($dir !== false) {
             foreach ($dir as $file) {
+                if (!str_ends_with($file, '.php')) continue;
+
+                $className = basename($file, '.php');
+                $fqcn = "voidworks\\ppitems\\items\\preset\\" . $className;
+
                 try {
-                    $reflection = new ReflectionClass($file);
+                    $reflection = new ReflectionClass($fqcn);
 
-                    $instance = $reflection->newInstanceWithoutConstructor();
+                    if ($reflection->isAbstract() || $reflection->isInterface()) {
+                        continue;
+                    }
 
-                    if($instance instanceof PartnerItem && $reflection->getConstructor()?->getNumberOfRequiredParameters() === 0) {
+                    if ($reflection->getConstructor()?->getNumberOfRequiredParameters() !== 0) {
+                        continue;
+                    }
+
+                    $instance = new $fqcn();
+                    if ($instance instanceof PartnerItem) {
                         $this->register($instance);
                     }
                 }catch (ReflectionException $exception){
@@ -64,6 +76,14 @@ final class PartnerItemsHandler {
         }
 
         return $this->partnerItems[$tag->getValue()] ?? throw new AssumptionFailedError();
+    }
+
+    /**
+     * @param string $identifier
+     * @return PartnerItem|null
+     */
+    public function getPartnerItemByIdentifier(string $identifier): ?PartnerItem {
+        return $this->partnerItems[$identifier] ?? null;
     }
 
     /**

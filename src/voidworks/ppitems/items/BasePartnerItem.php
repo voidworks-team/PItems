@@ -30,6 +30,18 @@ abstract class BasePartnerItem implements PartnerItem {
         $this->item->setCustomName($this->displayName);
     }
 
+    public function getIdentifier(): string {
+        return $this->identifier;
+    }
+
+    public function getDisplayName(): string {
+        return $this->displayName;
+    }
+
+    public function getItem(): Item {
+        return $this->item;
+    }
+
     public function getCooldown(): int {
         return $this->cooldown;
     }
