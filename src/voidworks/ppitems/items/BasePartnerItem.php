@@ -28,6 +28,7 @@ abstract class BasePartnerItem implements PartnerItem {
         $this->cooldown = $config->get("cooldown", 60);
         $this->lore = array_map([TextFormat::class, "colorize"], $config->get("lore", []));
         $this->item->setCustomName($this->displayName);
+        $this->item->setLore($this->lore);
     }
 
     public function getIdentifier(): string {
