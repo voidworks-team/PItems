@@ -12,7 +12,7 @@ use voidworks\ppitems\Loader;
 abstract class BasePartnerItem implements PartnerItem {
 
     protected int $cooldown = 0;
-    protected array $lore = [];
+    protected Config $config;
 
     public function __construct(
         protected string $identifier,
@@ -25,10 +25,11 @@ abstract class BasePartnerItem implements PartnerItem {
             mkdir($dir);
         }
         $config = new Config($dir . "/" . $this->identifier . ".yml", Config::YAML);
+        $this->config = $config;
         $this->cooldown = $config->get("cooldown", 60);
-        $this->lore = array_map([TextFormat::class, "colorize"], $config->get("lore", []));
+        $lore = array_map([TextFormat::class, "colorize"], $config->get("lore", []));
         $this->item->setCustomName($this->displayName);
-        $this->item->setLore($this->lore);
+        $this->item->setLore($lore);
     }
 
     public function getIdentifier(): string {
@@ -47,7 +48,7 @@ abstract class BasePartnerItem implements PartnerItem {
         return $this->cooldown;
     }
 
-    public function canApplyLore(): bool {
-        return count($this->lore) > 0;
+    public function collectGarbage(): void {
+        unset($this->config);
     }
 }

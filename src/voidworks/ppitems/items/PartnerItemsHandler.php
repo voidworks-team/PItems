@@ -14,6 +14,9 @@ final class PartnerItemsHandler {
 
     protected const PARTNER_ITEM_NAME_TAG = "pp_item_namedtag";
 
+    /**
+     * @var PartnerItem[] $partnerItems
+     */
     protected array $partnerItems = [];
 
     public function __construct(
@@ -83,6 +86,12 @@ final class PartnerItemsHandler {
      */
     public function getPartnerItemByIdentifier(string $identifier): ?PartnerItem {
         return $this->partnerItems[$identifier] ?? null;
+    }
+
+    public function initialize(): void {
+        foreach ($this->partnerItems as $item) {
+            $item->collectGarbage();
+        }
     }
 
     /**

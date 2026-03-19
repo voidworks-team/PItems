@@ -2,12 +2,17 @@
 
 namespace voidworks\ppitems\listener;
 
+use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerItemUseEvent;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use voidworks\ppitems\items\etc\DurablePartnerItem;
+use voidworks\ppitems\items\event\PartnerItemUseEvent;
 use voidworks\ppitems\items\impl\OnAttackPartnerItem;
+use voidworks\ppitems\items\impl\OnChildAttackPartnerItem;
 use voidworks\ppitems\items\impl\OnUsePartnerItem;
 use voidworks\ppitems\items\impl\PartnerItem;
 use voidworks\ppitems\items\PartnerItemsHandler;
@@ -17,17 +22,17 @@ use voidworks\ppitems\session\SessionHandler;
 
 final class BaseListener implements Listener {
 
-    protected PartnerItemsHandler $handler;
+    protected PartnerItemsHandler $partnerItemsHandler;
     protected SessionHandler $sessionHandler;
 
     public function __construct(Loader $plugin) {
-        $this->handler = $plugin->getPartnerItemsHandler();
+        $this->partnerItemsHandler = $plugin->getPartnerItemsHandler();
         $this->sessionHandler = $plugin->getSessionHandler();
         $plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
     }
 
     public function onItemUseEvent(PlayerItemUseEvent $event): void {
-        $partnerItem = $this->handler->getPartnerItem($event->getItem());
+        $partnerItem = $this->partnerItemsHandler->getPartnerItem($event->getItem());
         $player = $event->getPlayer();
 
         if ($partnerItem === null) {
@@ -57,27 +62,69 @@ final class BaseListener implements Listener {
             return true;
         }
 
+        $event = new PartnerItemUseEvent($player, $partnerItem);
+        $event->call();
+
+        if($event->isCancelled()){
+            $context = $event->getCancelContext();
+
+            if($context !== null){
+                $player->sendMessage($context);
+            }
+
+            return true;
+        }
+
+        $item = $player->getInventory()->getItemInHand();
+
+        if ($partnerItem instanceof DurablePartnerItem) {
+            $item = $partnerItem->pop($item);
+        } else {
+            $item->pop();
+        }
+
+        $player->getInventory()->setItemInHand($item);
         return false;
     }
 
-    public function onEntityDamageEvent(EntityDamageByEntityEvent $event): void {
+    public function onEntityDamageEvent(EntityDamageEvent $event): void {
         $player = $event->getEntity();
-        $damager = $event->getDamager();
 
-        if (!$player instanceof Player || !$damager instanceof Player) {
+        if (!$player instanceof Player) {
             return;
         }
 
-        $partnerItem = $this->handler->getPartnerItem($damager->getInventory()->getItemInHand());
-        $session = $this->sessionHandler->getSession($player);
+        if ($event instanceof EntityDamageByEntityEvent) {
+            $damager = $event->getDamager();
 
-        if ($partnerItem instanceof OnAttackPartnerItem) {
-            if ($this->sendCooldownMessageIfOnCooldown($player, $session, $partnerItem)) {
+            if (!$damager instanceof Player) {
                 return;
             }
 
-            $session->applyCooldowns($partnerItem);
-            $partnerItem->onAttack($damager, $player);
+            $partnerItem = $this->partnerItemsHandler->getPartnerItem($damager->getInventory()->getItemInHand());
+            $session = $this->sessionHandler->getSession($damager);
+
+            if ($partnerItem instanceof OnAttackPartnerItem && !$event instanceof EntityDamageByChildEntityEvent) {
+                if ($this->sendCooldownMessageIfOnCooldown($damager, $session, $partnerItem)) {
+                    return;
+                }
+
+                $session->applyCooldowns($partnerItem);
+                $partnerItem->onAttack($damager, $player);
+            }
+
+            if ($event instanceof EntityDamageByChildEntityEvent) {
+                if ($partnerItem instanceof OnChildAttackPartnerItem) {
+
+                    if($this->sendCooldownMessageIfOnCooldown($damager, $session, $partnerItem)){
+                        return;
+                    }
+
+                    if (!$partnerItem->onChildAttack($damager, $player, $event->getChild())) {
+                        $event->cancel();
+                    }
+                }
+            }
         }
     }
 }

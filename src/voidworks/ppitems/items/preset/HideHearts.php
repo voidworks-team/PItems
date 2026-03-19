@@ -2,7 +2,6 @@
 
 namespace voidworks\ppitems\items\preset;
 
-use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\item\VanillaItems;
 use pocketmine\network\mcpe\protocol\SetHudPacket;
 use pocketmine\network\mcpe\protocol\types\hud\HudElement;
@@ -10,14 +9,11 @@ use pocketmine\network\mcpe\protocol\types\hud\HudVisibility;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
-use ReflectionException;
 use voidworks\ppitems\items\BasePartnerItem;
 use voidworks\ppitems\items\impl\OnAttackPartnerItem;
-use voidworks\ppitems\items\impl\OnUsePartnerItem;
 use voidworks\ppitems\Loader;
-use voidworks\ppitems\utils\TimedListener;
 
-class HideHearts extends BasePartnerItem implements OnAttackPartnerItem {
+final class HideHearts extends BasePartnerItem implements OnAttackPartnerItem {
 
     public function __construct() {
         parent::__construct(
@@ -28,7 +24,8 @@ class HideHearts extends BasePartnerItem implements OnAttackPartnerItem {
     }
 
     /**
-     * @throws ReflectionException
+     * @param Player $damager
+     * @param Player $player
      */
     public function onAttack(Player $damager, Player $player): void {
         $packet = SetHudPacket::create([HudElement::HEALTH], HudVisibility::HIDE);
@@ -40,6 +37,6 @@ class HideHearts extends BasePartnerItem implements OnAttackPartnerItem {
         Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use ($player): void {
             $resetPacket = SetHudPacket::create([HudElement::HEALTH], HudVisibility::RESET);
             $player->getNetworkSession()->sendDataPacket($resetPacket);
-        }), 20*5);
+        }), 20*8);
     }
 }

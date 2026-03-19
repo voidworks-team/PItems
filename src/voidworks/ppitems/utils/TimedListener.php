@@ -28,13 +28,11 @@ final class TimedListener {
      *  Creates a temporal listener which will be unregister at the given time
      * @throws ReflectionException
      */
-    static public function listen(PluginBase $plugin, Closure $callback, ?Closure $onFinish = null, int $priority = EventPriority::NORMAL, int $delay = 10): void {
-        PMUtils::validateCallableSignature($callback, function (Event $event): void {
-        });
+    static public function listen(PluginBase $plugin, Closure $callback, ?Closure $onFinish = null, int $priority = EventPriority::NORMAL, int $delay = 20): void {
+        PMUtils::validateCallableSignature($callback, function (Event $event): void {});
 
         if ($onFinish !== null) {
-            PMUtils::validateCallableSignature($onFinish, function (): void {
-            });
+            PMUtils::validateCallableSignature($onFinish, function (): void {});
         }
 
         $eventClass = (new ReflectionFunction($callback))->getParameters()[0]->getType()->getName();

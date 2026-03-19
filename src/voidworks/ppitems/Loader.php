@@ -72,10 +72,8 @@ class Loader extends PluginBase {
             new PartnerItemCommand
         ]);
 
-        (new BaseListener($this));
-    }
+        $this->partnerItemsHandler->initialize();
 
-    protected function onDisable(): void {
-
+        new BaseListener($this);
     }
 }

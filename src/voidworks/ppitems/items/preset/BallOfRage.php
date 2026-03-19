@@ -4,15 +4,18 @@ namespace voidworks\ppitems\items\preset;
 
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
+use pocketmine\entity\Entity;
+use pocketmine\entity\projectile\Egg;
 use pocketmine\item\VanillaItems;
-use pocketmine\world\particle\HugeExplodeParticle;
-use pocketmine\world\sound\ExplodeSound;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\particle\HugeExplodeParticle;
+use pocketmine\world\sound\ExplodeSound;
 use voidworks\ppitems\items\BasePartnerItem;
+use voidworks\ppitems\items\impl\OnChildAttackPartnerItem;
 use voidworks\ppitems\items\impl\OnUsePartnerItem;
 
-class BallOfRage extends BasePartnerItem implements OnUsePartnerItem {
+final class BallOfRage extends BasePartnerItem implements OnChildAttackPartnerItem, OnUsePartnerItem {
 
     public function __construct() {
         parent::__construct(
@@ -23,14 +26,7 @@ class BallOfRage extends BasePartnerItem implements OnUsePartnerItem {
     }
 
     public function onUse(Player $player): void {
-        $item = $player->getInventory()->getItemInHand();
         $effectManager = $player->getEffects();
-        
-        $effects = [
-        new EffectInstance(VanillaEffects::RESISTANCE(), 6 * 20, 2),
-        new EffectInstance(VanillaEffects::STRENGTH(), 6 * 20, 1),
-        new EffectInstance(VanillaEffects::WITHER(), 20 * 8, 1)
-    ];
 
         $player->getWorld()->addSound(
             $player->getPosition(),
@@ -41,14 +37,20 @@ class BallOfRage extends BasePartnerItem implements OnUsePartnerItem {
             $player->getPosition(),
             new HugeExplodeParticle()
         );
-        
-        foreach ($effects as $effect) {
-         $effectManager->add($effect);
+
+        $effectManager->add(new EffectInstance(VanillaEffects::RESISTANCE(), 6 * 20, 2));
+        $effectManager->add(new EffectInstance(VanillaEffects::STRENGTH(), 6 * 20, 1));
+
+        $player->sendMessage(TextFormat::colorize('&r&eYou have successfully used &cBall Of Rage'));
+    }
+
+    public function onChildAttack(Player $damager, Player $player, Entity $child): bool {
+        if (!$child instanceof Egg) {
+            return false;
         }
-            $player->sendMessage(TextFormat::colorize('&r&eYou have successfully used &cBall Of Rage'));
 
-            $item->pop();
-            $player->getInventory()->setItemInHand($item);
-
+        $effectManager = $player->getEffects();
+        $effectManager->add(new EffectInstance(VanillaEffects::WITHER(), 20 * 8, 1));
+        return true;
     }
 }

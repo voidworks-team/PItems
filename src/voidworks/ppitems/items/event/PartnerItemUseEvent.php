@@ -11,6 +11,7 @@ use voidworks\ppitems\items\impl\PartnerItem;
 class PartnerItemUseEvent extends Event implements Cancellable {
     use CancellableTrait;
 
+    protected ?string $cancelContext = null;
 
     public function __construct(
         protected Player      $player,
@@ -31,6 +32,20 @@ class PartnerItemUseEvent extends Event implements Cancellable {
      */
     public function getPartnerItem(): PartnerItem {
         return $this->item;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCancelContext(): ?string {
+        return $this->isCancelled() ? $this->cancelContext : null;
+    }
+
+    /**
+     * @param string $cancelContext
+     */
+    public function setCancelContext(string $cancelContext): void {
+        $this->cancelContext = $cancelContext;
     }
 
 
